@@ -1,8 +1,14 @@
 /*
-	Description:
+	Description: Auskunfts- und Reisebuchungssystem
 	Contributors:
 	License:
 */
-% Fakten 
+% Benutzungsschnittstelle 
 
-% Prädikate
+% Gebietsverwaltung
+
+% Hotelverwaltung
+
+% Kundenverwaltung
+
+% Buchungsverwaltung
