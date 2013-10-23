@@ -64,8 +64,31 @@ gebiete_zeigen([K|R]):-
 	gebiete_zeigen(R).
 	gebiete_zeigen([]).
 	
-% Hotelverwaltung
+gebiet_waehlen:-
+	nl, write('Gewünschtes Gebiet: '), lese_string(Gebiet), nl, bearbeite_gebiet(Gebiet).
+	
+%-- kein Gebiet gewählt
+bearbeite_gebiet('').
 
+%-- vorhandenes Gebiet 
+bearbeite_gebiet(Gebiet):-
+	hotel(_, _, _, Gebiet), retract(wahl(gebiet(_))), asserta(wahl(gebiet(Gebiet))).
+	
+% Hotelverwaltung
+hotel_waehlen:-
+	nl, write('gewünschtes Hotel: '), lese_string(Hotel), nl, bearbeite_hotel(Hotel).
+
+%-- kein Hotel gewaehlt 
+	bearbeite_hotel(''):- !.
+	
+%-- Hotelname 
+bearbeite_hotel(Hotel):-
+	hotel(HotelNr, Hotel, _, _), retract(wahl(hotel(_))), asserta(wahl(hotel(HotelNr))), zeige_hotel(HotelNr), !.
+
+%-- Hotelnummer 
+bearbeite_hotel(Hotel):-
+	hotel(Hotel, _, _, _), retract(wahl(hotel(_))), asserta(wahl(hotel(Hotel))), zeige_hotel(Hotel), !.
+	
 % Kundenverwaltung
 
 % Buchungsverwaltung
