@@ -57,7 +57,7 @@ gebiete_zeigen([K|R]):-
         gebiete_zeigen([]).
 
 gebiet_waehlen:-
-        nl, write('Gewu¨nschtes Gebiet: '), lese_string(Gebiet), nl, bearbeite_gebiet(Gebiet).
+        nl, write('Gewünschtes Gebiet: '), lese_string(Gebiet), nl, bearbeite_gebiet(Gebiet).
 
 %kein Gebiet gewaehlt
 bearbeite_gebiet('').
@@ -65,6 +65,10 @@ bearbeite_gebiet('').
 %vorhandenes Gebiet
 bearbeite_gebiet(Gebiet):-
         hotel(_, _, _, Gebiet), retract(wahl(gebiet(_))), asserta(wahl(gebiet(Gebiet))).
+
+%nicht vorhandenes Gebiet
+bearbeite_gebiet(Gebiet):-
+		NOT(hotel(_,_,_,Gebiet)), write_ln ('Das gewünschte Gebiet ist nicht vorhanden.').
 
 % --- Hotelverwaltung -------------------------------
 
