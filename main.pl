@@ -30,7 +30,7 @@ wahl_ausfuehren(0'1):-
         gebiet_waehlen.
 
 wahl_ausfuehren(0'2):-
-        writeln(' Hotels'), nl, linksbuendig('Nummer', 9), linksbuendig('Name', 15), linksbuendig('Kategorie', 10), linksbuendig('Gebiet', 10), nl, linie_zeichnen('-', 40), nl, hotels_zeigen,
+        writeln(' Hotels'), nl, linksbuendig('Nummer', 10), linksbuendig('Name', 25), linksbuendig('Kategorie', 37), linksbuendig('Gebiet', 10), nl, linie_zeichnen('-', 43), nl, hotels_zeigen,
         hotel_waehlen, weiter.
 
 wahl_ausfuehren(0'3):-
@@ -49,7 +49,7 @@ wahl_ausfuehren(_).
 gebiete_zeigen:-
         findall(Gebiet, hotel(_, _, _, Gebiet), Liste1),
         sort(Liste1, Liste2),
-        gebiete_zeigen(Liste2),
+        gebiete_zeigen(Liste2).
 
 gebiete_zeigen([K|R]):-
         tab(2), writeln(K),
@@ -57,7 +57,7 @@ gebiete_zeigen([K|R]):-
         gebiete_zeigen([]).
 
 gebiet_waehlen:-
-        nl, write('Gewu¨nschtes Gebiet: '), lese_string(Gebiet), nl, bearbeite_gebiet(Gebiet).
+        nl, write('Gewuenschtes Gebiet: '), lese_string(Gebiet), nl, bearbeite_gebiet(Gebiet).
 
 %kein Gebiet gewaehlt
 bearbeite_gebiet('').
@@ -68,8 +68,20 @@ bearbeite_gebiet(Gebiet):-
 
 % --- Hotelverwaltung -------------------------------
 
+hotels_zeigen:-
+        findall(Hotel, hotel(_, Hotel, _, _), Liste1),
+        sort(Liste1, Liste2),
+        gebiete_zeigen(Liste2).
+
+hotels_zeigen([K|R]):-
+        tab(2), writeln(K),
+        gebiete_zeigen(R).
+        gebiete_zeigen([]).
+
+%zeige_Hotel(Hotel):-
+
 hotel_waehlen:-
-        nl, write('gewu¨nschtes Hotel: '), lese_string(Hotel), nl, bearbeite_hotel(Hotel).
+        nl, write('gewuenschtes Hotel: '), lese_string(Hotel), nl, bearbeite_hotel(Hotel).
 
 %-- kein Hotel gewaehlt
         bearbeite_hotel(''):- !.
@@ -106,7 +118,8 @@ buchen(Hotel, Kunde):-
    datum(Tag, Monat, Jahr), Wochen, Flughafen)), writeln('Gebucht.').
 buchen(_, _).
 
-bestimme_saison(Hotel, Flughafen, Monat, Saison):- hotel(Hotel, _, _, Gebiet),
+bestimme_saison(Hotel, Flughafen, Monat, Saison):-
+   hotel(Hotel, _, _, Gebiet),
    saison(Gebiet, Flughafen, Monat, Saison), !.
 bestimme_saison(Hotel, _Flughafen, Monat, Saison):- hotel(Hotel, _, _, Gebiet),
    findall(FHafen,
@@ -115,5 +128,26 @@ bestimme_saison(Hotel, _Flughafen, Monat, Saison):- hotel(Hotel, _, _, Gebiet),
    write('Abflug möglich ab: '), writeln(FHaefen)),
   fail.
 
-bestimme_preis(Hotel, Personen, Wochen, Saison, Preis):- preise(Hotel, Saison, Wochen, Kosten),
+bestimme_preis(Hotel, Personen, Wochen, Saison, Preis):-
+   preise(Hotel, Saison, Wochen, Kosten),
    Preis is Personen * Kosten, !.
+   
+% --- Formatierungsbefehle ---------------------------
+
+lese_string(String):-
+   readln([String|_], _, _, " .,0123456789", uppercase), writeln(String), !.
+lese_string('').
+
+lese_datum(Tag, Monat, Jahr):-
+
+lese_zahl(Zahl):-
+
+linksbuendig(Ausgabe, Breite):-
+   format('~w~t~*|', [Ausgabe, Breite]).
+   
+linie_zeichnen(Zeichen, Breite):-
+   name(Zeichen, [Ascii]),
+   format('~*t~*|', [Ascii, Breite]).
+   
+weiter:-
+

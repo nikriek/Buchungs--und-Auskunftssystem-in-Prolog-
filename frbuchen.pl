@@ -1,5 +1,4 @@
-% Autor: Georg Zänker, Niklas Rieckenbrauck, Jonas Umland
-% Datum: 27.10.2013
+
 
 buchung(101, egda01n, 3, datum(2, 10, 95), 2, 'Frankfurt').
 buchung(102, gpah01n, 2, datum(3, 9, 94), 2, 'Stuttgart').

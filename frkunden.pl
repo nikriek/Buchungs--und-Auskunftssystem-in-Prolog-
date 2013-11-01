@@ -1,5 +1,4 @@
-% Autor: Georg Zänker, Niklas Rieckenbrauck, Jonas Umland
-% Datum: 27.10.2013
+
 
 kunde(101, 'Plum', 'Untergasse 4', 64285, 'Darmstadt').
 kunde(102, 'Rettig', 'Odenwaldstr. 17', 64293, 'Darmstadt').
