@@ -12,10 +12,20 @@ titel:-
         writeln('----- Buchungs- und Auskunftssystem ------'), writeln('----- Froh-Reisen GmbH, Darmstadt ------'), nl.
 
 menue:-
-        nl, writeln('Hauptmenu¨: '), nl, writeln(' 1 - Urlaubsgebiete'), writeln(' 2 - Hotels'), writeln(' 3 - Kunden'), writeln(' 4 - Buchen'), writeln(' 5 - neuer Kunde'), writeln(' 0 - Beenden'), nl, write(' Ihre Wahl: '), get_single_char(Ch), wahl_ausfuehren(Ch),
+        nl,
+        writeln('Hauptmenu¨: '), nl,
+        writeln(' 1 - Urlaubsgebiete'),
+        writeln(' 2 - Hotels'),
+        writeln(' 3 - Kunden'),
+        writeln(' 4 - Buchen'),
+        writeln(' 5 - neuer Kunde'),
+        writeln(' 0 - Beenden'), nl,
+        write(' Ihre Wahl: '),
+        get_single_char(Ch),
+        wahl_ausfuehren(Ch),
         Ch \== 0'0, !,
         menue.
-        menue.
+menue.
 
 terminierung:- titel,
         writeln('Speichere Datenbank...'),
@@ -23,28 +33,47 @@ terminierung:- titel,
         write(' Buchungen...'), rename_file('Z:/prolog-project/frbuchen.pl', 'frbuchen.bak'), tell('Z:/prolog-project/frbuchen.pl'), listing(buchung), told, writeln(' ok!'),
         retractall(wahl(_)).
 
-% --- Menüverwaltung ----------------------------------
+% --- Menüverwaltung -----------------------------------------------------------
 
 wahl_ausfuehren(0'1):-
-        writeln(' Urlaubsgebiete'), nl, gebiete_zeigen,
+        writeln(' Urlaubsgebiete'), nl,
+        gebiete_zeigen,
         gebiet_waehlen.
 
 wahl_ausfuehren(0'2):-
-        writeln(' Hotels'), nl, linksbuendig('Nummer', 10), linksbuendig('Name', 25), linksbuendig('Kategorie', 37), linksbuendig('Gebiet', 10), nl, linie_zeichnen('-', 43), nl, hotels_zeigen,
-        hotel_waehlen, weiter.
+        writeln(' Hotels'), nl,
+        linksbuendig('Nummer', 10),
+        linksbuendig('Name', 25),
+        linksbuendig('Kategorie', 37),
+        linksbuendig('Gebiet', 10), nl,
+        linie_zeichnen('-', 43), nl,
+        hotels_zeigen,
+        hotel_waehlen,
+        weiter.
 
 wahl_ausfuehren(0'3):-
-        writeln(' Kunden'), nl, write('Name oder Nummer: '), lese_string(Kunde), bearbeite_kunde(Kunde), weiter.
+        writeln(' Kunden'), nl,
+        write('Name oder Nummer: '),
+        read(Kunde),
+        bearbeite_kunde(Kunde),
+        weiter.
 
 wahl_ausfuehren(0'4):-
-        writeln(' Buchen'), nl, hole_kunde(Kunde), hole_hotel(Hotel), buchen(Hotel, Kunde).
+        writeln(' Buchen'), nl,
+        hole_kunde(Kunde),
+        hole_hotel(Hotel),
+        buchen(Hotel, Kunde).
 
 wahl_ausfuehren(0'5):-
-        writeln(' neuer Kunde'), nl, retractall(wahl(_)), asserta(wahl(gebiet(_))), asserta(wahl(hotel(_))), asserta(wahl(kunde(_))).
+        writeln(' neuer Kunde'), nl,
+        retractall(wahl(_)),
+        asserta(wahl(gebiet(_))),
+        asserta(wahl(hotel(_))),
+        asserta(wahl(kunde(_))).
 
 wahl_ausfuehren(_).
 
-% --- Gebietsverwaltung -------------------------------
+% --- Gebietsverwaltung --------------------------------------------------------
 
 gebiete_zeigen:-
         findall(Gebiet, hotel(_, _, _, Gebiet), Liste1),
@@ -57,56 +86,70 @@ gebiete_zeigen([K|R]):-
         gebiete_zeigen([]).
 
 gebiet_waehlen:-
-<<<<<<< HEAD
-        nl, write('Gewuenschtes Gebiet: '), lese_string(Gebiet), nl, bearbeite_gebiet(Gebiet).
-=======
-        nl, write('Gewünschtes Gebiet: '), lese_string(Gebiet), nl, bearbeite_gebiet(Gebiet).
->>>>>>> bd838115f3eb2b356262395ead03f2f251ca0e78
+        nl, write('Gewünschtes Gebiet: '),
+        read(Gebiet), nl, write(Gebiet), nl, bearbeite_gebiet(Gebiet).
+
 
 %kein Gebiet gewaehlt
 bearbeite_gebiet('').
 
 %vorhandenes Gebiet
 bearbeite_gebiet(Gebiet):-
-        hotel(_, _, _, Gebiet), retract(wahl(gebiet(_))), asserta(wahl(gebiet(Gebiet))).
+        hotel(_, _, _, Gebiet),
+        retract(wahl(gebiet(_))),
+        asserta(wahl(gebiet(Gebiet))).
 
 %nicht vorhandenes Gebiet
 bearbeite_gebiet(Gebiet):-
-		NOT(hotel(_,_,_,Gebiet)), write_ln ('Das gewünschte Gebiet ist nicht vorhanden.').
+                not(hotel(_,_,_,Gebiet)),
+                writeln('Das gewünschte Gebiet ist nicht vorhanden.').
 
-% --- Hotelverwaltung -------------------------------
+% --- Hotelverwaltung ----------------------------------------------------------
 
 hotels_zeigen:-
-        findall(Hotel, hotel(_, Hotel, _, _), Liste1),
+        findall(hotel(Nummer, Name, Kategorie, Gebiet), hotel(Nummer, Name, Kategorie, Gebiet), Liste1),
         sort(Liste1, Liste2),
-        gebiete_zeigen(Liste2).
-
-hotels_zeigen([K|R]):-
-        tab(2), writeln(K),
-        gebiete_zeigen(R).
-        gebiete_zeigen([]).
-
-%zeige_Hotel(Hotel):-
+        hotels_zeigen(Liste2).
+hotels_zeigen([hotel(Nummer, Name, Kategorie, Gebiet)|R]):-
+        linksbuendig(Nummer, 10),
+        linksbuendig(Name, 25),
+        linksbuendig(Kategorie, 37),
+        linksbuendig(Gebiet, 10), nl,
+        hotels_zeigen(R).
+hotels_zeigen([]).
 
 hotel_waehlen:-
-        nl, write('gewuenschtes Hotel: '), lese_string(Hotel), nl, bearbeite_hotel(Hotel).
+        nl, write('gewuenschtes Hotel: '), read(Hotel), nl, bearbeite_hotel(Hotel).
+
 
 %-- kein Hotel gewaehlt
-        bearbeite_hotel(''):- !.
-
+bearbeite_hotel(''):- !.
 %-- Hotelname
 bearbeite_hotel(Hotel):-
-        hotel(HotelNr, Hotel, _, _), retract(wahl(hotel(_))), asserta(wahl(hotel(HotelNr))), zeige_hotel(HotelNr), !.
-
+        hotel(HotelNr, Hotel, _, _),
+        retract(wahl(hotel(_))),
+        asserta(wahl(hotel(HotelNr))),
+        zeige_hotel(HotelNr), !.
 %-- Hotelnummer
-bearbeite_hotel(Hotel):-
-        hotel(Hotel, _, _, _), retract(wahl(hotel(_))), asserta(wahl(hotel(Hotel))), zeige_hotel(Hotel), !.
+bearbeite_hotel(HotelNr):-
+        hotel(HotelNr, _, _, _),
+        retract(wahl(hotel(_))),
+        asserta(wahl(hotel(HotelNr))),
+        zeige_hotel(HotelNr), !.
+%nicht vorhandenes Hotel
+bearbeite_gebiet(Hotel):-
+        not(hotel(_,Hotel,_,_)),
+        writeln('Das gewünschte Hotel ist nicht vorhanden.').
+
+zeige_hotel(HotelNr):-
+        write('Gewählt: '),
+        hotels_zeigen([hotel(HotelNr, Hotel, _, _)]).
 
 % --- Kundenverwaltung -------------------------------
 
 bearbeite_kunde(Kunde):-
    atom(Kunde),
-   writeln('Adresse des neuen Kunden: '), nl, write('Strasse und Nr.: '), lese_string(Strasse), write('Postleitzahl : '), lese_string(PLZ), write('Ort : '), lese_string(Ort), findall(KNr, kunde(KNr,_,_,_,_), Liste1),
+   writeln('Adresse des neuen Kunden: '), nl, write('Strasse und Nr.: '), read(Strasse), write('Postleitzahl : '), read(PLZ), write('Ort : '), read(Ort), findall(KNr, kunde(KNr,_,_,_,_), Liste1),
    sort(Liste1, Liste2),
    last(KNr1, Liste2),
    KundenNr is KNr1 + 1, speicher_kunde(kunde(KundenNr,Kunde,Strasse,PLZ,Ort)),
@@ -139,16 +182,13 @@ bestimme_saison(Hotel, _Flughafen, Monat, Saison):- hotel(Hotel, _, _, Gebiet),
 bestimme_preis(Hotel, Personen, Wochen, Saison, Preis):-
    preise(Hotel, Saison, Wochen, Kosten),
    Preis is Personen * Kosten, !.
-   
+
 % --- Formatierungsbefehle ---------------------------
 
-lese_string(String):-
-   readln([String|_], _, _, " .,0123456789", uppercase), writeln(String), !.
-lese_string('').
 
-lese_datum(Tag, Monat, Jahr):-
+%lese_datum(Tag, Monat, Jahr):-
 
-lese_zahl(Zahl):-
+%lese_zahl(Zahl):-
 
 linksbuendig(Ausgabe, Breite):-
    format('~w~t~*|', [Ausgabe, Breite]).
@@ -157,5 +197,6 @@ linie_zeichnen(Zeichen, Breite):-
    name(Zeichen, [Ascii]),
    format('~*t~*|', [Ascii, Breite]).
    
-weiter:-
+%weiter:-
+
 
