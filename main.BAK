@@ -137,7 +137,7 @@ bearbeite_hotel(HotelNr):-
         asserta(wahl(hotel(HotelNr))),
         zeige_hotel(HotelNr), !.
 %nicht vorhandenes Hotel
-bearbeite_gebiet(Hotel):-
+bearbeite_hotel(Hotel):-
         not(hotel(_,Hotel,_,_)),
         writeln('Das gewünschte Hotel ist nicht vorhanden.').
 
@@ -160,13 +160,22 @@ speicher_kunde(kunde(KundenNr,Kunde,Strasse,PLZ,Ort)):- nl, write('Adresse korre
    assert(kunde(KundenNr, Kunde, Strasse, PLZ, Ort)), retract(wahl(kunde(_))), asserta(wahl(kunde(KundenNr))).
 speicher_kunde(_).
 
-% --- Buchungsverwaltung ------------------------------
+% --- Holen von Kunden/Hotels --------------------------------------------------
+
+% --- Buchungsverwaltung -------------------------------------------------------
 
 buchen(Hotel, Kunde):-
    nl, writeln('Abflug'),
-   write('am: '), lese_datum(Tag, Monat, Jahr), write('ab: '), lese_string(Flughafen), bestimme_saison(Hotel,Flughafen,Monat,Saison), nl, write('Personen: '), lese_zahl(Personen), write('Wochen : '), lese_zahl(Wochen), bestimme_preis(Hotel,Personen,Wochen,Saison,Preis),nl, write('Gesamtpreis: '), write(Preis), writeln(' DM'), write('Buchen (ja/nein): '), lese_string(Buchen), Buchen = 'ja',
-   asserta(buchung(Kunde, Hotel, Personen,
-   datum(Tag, Monat, Jahr), Wochen, Flughafen)), writeln('Gebucht.').
+   write('am: '), lese_datum(Tag, Monat, Jahr),
+   write('ab: '), lese_string(Flughafen),
+   bestimme_saison(Hotel,Flughafen,Monat,Saison), nl,
+   write('Personen: '), lese_zahl(Personen),
+   write('Wochen : '), lese_zahl(Wochen),
+   bestimme_preis(Hotel,Personen,Wochen,Saison,Preis),nl,
+   write('Gesamtpreis: '), write(Preis), writeln(' Euro'),
+   write('Buchen (ja/nein): '), lese_string(Buchen), Buchen = 'ja',
+   asserta(buchung(Kunde, Hotel, Personen,datum(Tag, Monat, Jahr), Wochen, Flughafen)),
+   writeln('Gebucht.').
 buchen(_, _).
 
 bestimme_saison(Hotel, Flughafen, Monat, Saison):-
@@ -186,9 +195,13 @@ bestimme_preis(Hotel, Personen, Wochen, Saison, Preis):-
 % --- Formatierungsbefehle ---------------------------
 
 
-%lese_datum(Tag, Monat, Jahr):-
+lese_datum(Tag, Monat, Jahr):-
+       nl, write('Tag(DD): '), read(Tag),
+       nl, write('Monat(MM): '), read(Monat),
+       nl, write('Jahr(YY): '), read(Jahr).
+lese_datum('').
 
-%lese_zahl(Zahl):-
+lese_zahl(Zahl):- readln([Zahl|_]).
 
 linksbuendig(Ausgabe, Breite):-
    format('~w~t~*|', [Ausgabe, Breite]).
@@ -196,7 +209,3 @@ linksbuendig(Ausgabe, Breite):-
 linie_zeichnen(Zeichen, Breite):-
    name(Zeichen, [Ascii]),
    format('~*t~*|', [Ascii, Breite]).
-   
-%weiter:-
-
-
