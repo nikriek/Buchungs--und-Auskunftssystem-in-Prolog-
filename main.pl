@@ -6,7 +6,7 @@ start:-
         initialisierung, menue, terminierung.
 
 initialisierung:-
-        titel, retractall(wahl(_)), asserta(wahl(gebiet(_))), asserta(wahl(hotel(_))), asserta(wahl(kunde(_))), writeln('Lade Datenbank...'), tab(2), consult('Z:/prolog-project/frkunden.pl'), tab(2), consult('Z:/prolog-project/frbuchen.pl'), tab(2), consult('Z:/prolog-project/frhotel.pl'), nl.
+        titel, retractall(wahl(_)), asserta(wahl(gebiet(_))), asserta(wahl(hotel(_))), asserta(wahl(kunde(_))), writeln('Lade Datenbank...'), tab(2), consult('H:/Informatik/prolog-project-master/frkunden.pl'), tab(2), consult('H:/Informatik/prolog-project-master/frbuchen.pl'), tab(2), consult('H:/Informatik/prolog-project-master/frhotel.pl'), nl.
 
 titel:-
         writeln('----- Buchungs- und Auskunftssystem ------'), writeln('----- Froh-Reisen GmbH, Darmstadt ------'), nl.
@@ -29,8 +29,8 @@ menue.
 
 terminierung:- titel,
         writeln('Speichere Datenbank...'),
-        write(' Kunden...'), rename_file('Z:/prolog-project/frkunden.pl', 'frkunden.bak'), tell('Z:/prolog-project/frkunden.pl'), listing(kunde), told, writeln(' ok!'),
-        write(' Buchungen...'), rename_file('Z:/prolog-project/frbuchen.pl', 'frbuchen.bak'), tell('Z:/prolog-project/frbuchen.pl'), listing(buchung), told, writeln(' ok!'),
+        write(' Kunden...'), rename_file('H:/Informatik/prolog-project-master/frkunden.pl', 'frkunden.bak'), tell('H:/Informatik/prolog-project-master/frkunden.pl'), listing(kunde), told, writeln(' ok!'),
+        write(' Buchungen...'), rename_file('H:/Informatik/prolog-project-master/frbuchen.pl', 'frbuchen.bak'), tell('H:/Informatik/prolog-project-master/frbuchen.pl'), listing(buchung), told, writeln(' ok!'),
         retractall(wahl(_)).
 
 % --- Menüverwaltung -----------------------------------------------------------
@@ -48,20 +48,20 @@ wahl_ausfuehren(0'2):-
         linksbuendig('Gebiet', 10), nl,
         linie_zeichnen('-', 43), nl,
         hotels_zeigen,
-        hotel_waehlen,
-        weiter.
+        hotel_waehlen.
+        %weiter.
 
 wahl_ausfuehren(0'3):-
         writeln(' Kunden'), nl,
         write('Name oder Nummer: '),
         read(Kunde),
-        bearbeite_kunde(Kunde),
-        weiter.
+        bearbeite_kunde(Kunde).
+        %weiter.
 
 wahl_ausfuehren(0'4):-
         writeln(' Buchen'), nl,
-        hole_kunde(Kunde),
         hole_hotel(Hotel),
+        hole_kunde(Kunde),
         buchen(Hotel, Kunde).
 
 wahl_ausfuehren(0'5):-
@@ -108,8 +108,7 @@ bearbeite_gebiet(Gebiet):-
 
 hotels_zeigen:-
         findall(hotel(Nummer, Name, Kategorie, Gebiet), hotel(Nummer, Name, Kategorie, Gebiet), Liste1),
-        sort(Liste1, Liste2),
-        hotels_zeigen(Liste2).
+        sort(Liste1, Liste2).
 hotels_zeigen([hotel(Nummer, Name, Kategorie, Gebiet)|R]):-
         linksbuendig(Nummer, 10),
         linksbuendig(Name, 25),
@@ -142,25 +141,57 @@ bearbeite_hotel(Hotel):-
         writeln('Das gewünschte Hotel ist nicht vorhanden.').
 
 zeige_hotel(HotelNr):-
-        write('Gewählt: '),
-        hotels_zeigen([hotel(HotelNr, Hotel, _, _)]).
+        writeln('Gewählt: '),
+        hotel(HotelNr, Name, Kategorie, Gebiet),
+        hotels_zeigen([hotel(HotelNr, Name, Kategorie, Gebiet)]).
 
 % --- Kundenverwaltung -------------------------------
 
 bearbeite_kunde(Kunde):-
    atom(Kunde),
-   writeln('Adresse des neuen Kunden: '), nl, write('Strasse und Nr.: '), read(Strasse), write('Postleitzahl : '), read(PLZ), write('Ort : '), read(Ort), findall(KNr, kunde(KNr,_,_,_,_), Liste1),
+   writeln('Adresse des neuen Kunden: '), nl,
+   write('Strasse und Nr.: '), read(Strasse),
+   write('Postleitzahl : '), read(PLZ),
+   write('Ort : '), read(Ort),
+   findall(KNr, kunde(KNr,_,_,_,_), Liste1),
    sort(Liste1, Liste2),
-   last(KNr1, Liste2),
+   last(Liste2, KNr1),
    KundenNr is KNr1 + 1, speicher_kunde(kunde(KundenNr,Kunde,Strasse,PLZ,Ort)),
    !.
 
-speicher_kunde(kunde(KundenNr,Kunde,Strasse,PLZ,Ort)):- nl, write('Adresse korrekt (ja/nein): '), lese_string(Antwort),
+speicher_kunde(kunde(KundenNr,Kunde,Strasse,PLZ,Ort)):-
+   nl, write('Adresse korrekt (ja/nein): '), read(Antwort),
    Antwort = 'ja',
-   assert(kunde(KundenNr, Kunde, Strasse, PLZ, Ort)), retract(wahl(kunde(_))), asserta(wahl(kunde(KundenNr))).
+   assert(kunde(KundenNr, Kunde, Strasse, PLZ, Ort)),
+   retract(wahl(kunde(_))), asserta(wahl(kunde(KundenNr))).
 speicher_kunde(_).
 
 % --- Holen von Kunden/Hotels --------------------------------------------------
+
+hole_hotel(HotelNr):-
+   wahl(hotel(HotelNr)), var(HotelNr),
+   wahl_ausfuehren(0'2),
+   fail.
+hole_hotel(HotelNr):-
+   wahl(hotel(HotelNr)), nonvar(HotelNr),
+   zeige_hotel(HotelNr).
+   
+hole_kunde(KundenNr):-
+   wahl(kunde(KundenNr)), var(KundenNr),
+   wahl_ausfuehren(0'3),
+   fail.
+hole_kunde(KundenNr):-
+   wahl(kunde(KundenNr)), nonvar(KundenNr),
+   zeige_kunde(KundenNr).
+
+zeige_kunde(KundenNr):-
+   kunde(KundenNr,Kunde,Strasse,PLZ,Ort),
+   linksbuendig(KundenNr, 10),
+   linksbuendig(Kunde, 25),
+   linksbuendig(Strasse, 37),
+   linksbuendig(PLZ, 10),
+   linksbuendig(Ort, 20),
+   nl.
 
 % --- Buchungsverwaltung -------------------------------------------------------
 
