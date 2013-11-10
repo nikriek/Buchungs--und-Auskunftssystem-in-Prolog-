@@ -6,7 +6,7 @@ start:-
         initialisierung, menue, terminierung.
 
 initialisierung:-
-        titel, retractall(wahl(_)), asserta(wahl(gebiet(_))), asserta(wahl(hotel(_))), asserta(wahl(kunde(_))), writeln('Lade Datenbank...'), tab(2), consult('H:/Informatik/prolog-project-master/frkunden.pl'), tab(2), consult('H:/Informatik/prolog-project-master/frbuchen.pl'), tab(2), consult('H:/Informatik/prolog-project-master/frhotel.pl'), nl.
+        titel, retractall(wahl(_)), asserta(wahl(gebiet(_))), asserta(wahl(hotel(_))), asserta(wahl(kunde(_))), writeln('Lade Datenbank...'), tab(2), consult('C:/Users/Jonas/Documents/GitHub/prolog-project/frkunden.pl'), tab(2), consult('C:/Users/Jonas/Documents/GitHub/prolog-project/frbuchen.pl'), tab(2), consult('C:/Users/Jonas/Documents/GitHub/prolog-project/frhotel.pl'), nl.
 
 titel:-
         writeln('----- Buchungs- und Auskunftssystem ------'), writeln('----- Froh-Reisen GmbH, Darmstadt ------'), nl.
@@ -29,8 +29,8 @@ menue.
 
 terminierung:- titel,
         writeln('Speichere Datenbank...'),
-        write(' Kunden...'), rename_file('H:/Informatik/prolog-project-master/frkunden.pl', 'frkunden.bak'), tell('H:/Informatik/prolog-project-master/frkunden.pl'), listing(kunde), told, writeln(' ok!'),
-        write(' Buchungen...'), rename_file('H:/Informatik/prolog-project-master/frbuchen.pl', 'frbuchen.bak'), tell('H:/Informatik/prolog-project-master/frbuchen.pl'), listing(buchung), told, writeln(' ok!'),
+        write(' Kunden...'), rename_file('C:/Users/Jonas/Documents/GitHub/prolog-project/frkunden.pl', 'frkunden.bak'), tell('C:/Users/Jonas/Documents/GitHub/prolog-project/frkunden.pl'), listing(kunde), told, writeln(' ok!'),
+        write(' Buchungen...'), rename_file('C:/Users/Jonas/Documents/GitHub/prolog-project/frbuchen.pl', 'frbuchen.bak'), tell('C:/Users/Jonas/Documents/GitHub/prolog-project/frbuchen.pl'), listing(buchung), told, writeln(' ok!'),
         retractall(wahl(_)).
 
 % --- Menüverwaltung -----------------------------------------------------------
@@ -38,7 +38,8 @@ terminierung:- titel,
 wahl_ausfuehren(0'1):-
         writeln(' Urlaubsgebiete'), nl,
         gebiete_zeigen,
-        gebiet_waehlen.
+        gebiet_waehlen,
+        hotels_zeigen.
 
 wahl_ausfuehren(0'2):-
         writeln(' Hotels'), nl,
@@ -107,8 +108,10 @@ bearbeite_gebiet(Gebiet):-
 % --- Hotelverwaltung ----------------------------------------------------------
 
 hotels_zeigen:-
+        wahl(gebiet(Gebiet)),
         findall(hotel(Nummer, Name, Kategorie, Gebiet), hotel(Nummer, Name, Kategorie, Gebiet), Liste1),
-        sort(Liste1, Liste2).
+        sort(Liste1, Liste2),
+        hotels_zeigen(Liste2).
 hotels_zeigen([hotel(Nummer, Name, Kategorie, Gebiet)|R]):-
         linksbuendig(Nummer, 10),
         linksbuendig(Name, 25),
