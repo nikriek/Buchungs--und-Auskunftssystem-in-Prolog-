@@ -6,7 +6,14 @@ start:-
         initialisierung, menue, terminierung.
 
 initialisierung:-
-        titel, retractall(wahl(_)), asserta(wahl(gebiet(_))), asserta(wahl(hotel(_))), asserta(wahl(kunde(_))), writeln('Lade Datenbank...'), tab(2), consult('Z:/prolog-project/frkunden.pl'), tab(2), consult('Z:/prolog-project/frbuchen.pl'), tab(2), consult('Z:/prolog-project/frhotel.pl'), nl.
+        titel, retractall(wahl(_)),
+        asserta(wahl(gebiet(_))),
+        asserta(wahl(hotel(_))),
+        asserta(wahl(kunde(_))),
+        writeln('Lade Datenbank...'), tab(2),
+        consult('Z:/prolog-project/frkunden.pl'), tab(2),
+        consult('Z:/prolog-project/frbuchen.pl'), tab(2),
+        consult('Z:/prolog-project/frhotel.pl'), nl.
 
 titel:-
         writeln('----- Buchungs- und Auskunftssystem ------'), writeln('----- Froh-Reisen GmbH, Darmstadt ------'), nl.
@@ -48,20 +55,20 @@ wahl_ausfuehren(0'2):-
         linksbuendig('Gebiet', 10), nl,
         linie_zeichnen('-', 43), nl,
         hotels_zeigen,
-        hotel_waehlen,
-        weiter.
+        hotel_waehlen.
+        %weiter.
 
 wahl_ausfuehren(0'3):-
         writeln(' Kunden'), nl,
         write('Name oder Nummer: '),
         read(Kunde),
-        bearbeite_kunde(Kunde),
-        weiter.
+        bearbeite_kunde(Kunde).
+        %weiter.
 
 wahl_ausfuehren(0'4):-
         writeln(' Buchen'), nl,
-        hole_kunde(Kunde),
         hole_hotel(Hotel),
+        hole_kunde(Kunde),
         buchen(Hotel, Kunde).
 
 wahl_ausfuehren(0'5):-
@@ -107,6 +114,7 @@ bearbeite_gebiet(Gebiet):-
 % --- Hotelverwaltung ----------------------------------------------------------
 
 hotels_zeigen:-
+        wahl(gebiet(Gebiet)),
         findall(hotel(Nummer, Name, Kategorie, Gebiet), hotel(Nummer, Name, Kategorie, Gebiet), Liste1),
         sort(Liste1, Liste2),
         hotels_zeigen(Liste2).
@@ -142,41 +150,89 @@ bearbeite_hotel(Hotel):-
         writeln('Das gewünschte Hotel ist nicht vorhanden.').
 
 zeige_hotel(HotelNr):-
-        write('Gewählt: '),
-        hotels_zeigen([hotel(HotelNr, Hotel, _, _)]).
+        writeln('Gewählt: '),
+        hotel(HotelNr, Name, Kategorie, Gebiet),
+        hotels_zeigen([hotel(HotelNr, Name, Kategorie, Gebiet)]).
 
 % --- Kundenverwaltung -------------------------------
 
+%-- kein Kunde gewaehlt
+bearbeite_kunde(''):- !.
+%-- neuer Kunde
 bearbeite_kunde(Kunde):-
    atom(Kunde),
-   writeln('Adresse des neuen Kunden: '), nl, write('Strasse und Nr.: '), read(Strasse), write('Postleitzahl : '), read(PLZ), write('Ort : '), read(Ort), findall(KNr, kunde(KNr,_,_,_,_), Liste1),
+   writeln('Adresse des neuen Kunden: '), nl,
+   write('Strasse und Nr.: '), read(Strasse),
+   write('Postleitzahl : '), read(PLZ),
+   write('Ort : '), read(Ort),
+   findall(KNr, kunde(KNr,_,_,_,_), Liste1),
    sort(Liste1, Liste2),
-   last(KNr1, Liste2),
+   last(Liste2, KNr1),
    KundenNr is KNr1 + 1, speicher_kunde(kunde(KundenNr,Kunde,Strasse,PLZ,Ort)),
    !.
+%-- Kundenname
+bearbeite_kunde(Kunde):-
+        kunde(KundenNr, Kunde, _, _, _),
+        retract(wahl(kunde(_))),
+        asserta(wahl(kunde(KundenNr))),
+        zeige_kunde(KundenNr), !.
+%-- Hotelnummer
+bearbeite_kunde(KundenNr):-
+        kunde(KundenNr, _, _, _, _),
+        retract(wahl(kunde(_))),
+        asserta(wahl(kunde(KundenNr))),
+        zeige_kunde(KundenNr), !.
 
-speicher_kunde(kunde(KundenNr,Kunde,Strasse,PLZ,Ort)):- nl, write('Adresse korrekt (ja/nein): '), lese_string(Antwort),
+
+zeige_kunde(KundenNr):-
+        writeln('Gewählt: '),
+        kunde(KundenNr, Name, Strasse, PLZ, Ort),
+        linksbuendig(KundenNr, 10),
+        linksbuendig(Name, 25),
+        linksbuendig(Strasse, 40),
+        linksbuendig(PLZ, 20),
+        linksbuendig(Ort, 15), nl.
+zeige_kunde([]).
+
+speicher_kunde(kunde(KundenNr,Kunde,Strasse,PLZ,Ort)):-
+   nl, write('Adresse korrekt (ja/nein): '), read(Antwort),
    Antwort = 'ja',
-   assert(kunde(KundenNr, Kunde, Strasse, PLZ, Ort)), retract(wahl(kunde(_))), asserta(wahl(kunde(KundenNr))).
-speicher_kunde(_).
+   assert(kunde(KundenNr, Kunde, Strasse, PLZ, Ort)),
+   retract(wahl(kunde(_))), asserta(wahl(kunde(KundenNr))).
 
 % --- Holen von Kunden/Hotels --------------------------------------------------
+
+hole_hotel(HotelNr):-
+   wahl(hotel(HotelNr)), nonvar(HotelNr),
+   zeige_hotel(HotelNr).
+hole_hotel(HotelNr):-
+   wahl(hotel(HotelNr)), var(HotelNr),
+   wahl_ausfuehren(0'2),
+   fail.
+   
+hole_kunde(KundenNr):-
+   wahl(kunde(KundenNr)), nonvar(KundenNr),
+   zeige_kunde(KundenNr).
+hole_kunde(KundenNr):-
+   wahl(kunde(KundenNr)), var(KundenNr),
+   wahl_ausfuehren(0'3),
+   fail.
 
 % --- Buchungsverwaltung -------------------------------------------------------
 
 buchen(Hotel, Kunde):-
    nl, writeln('Abflug'),
    write('am: '), lese_datum(Tag, Monat, Jahr),
-   write('ab: '), lese_string(Flughafen),
+   write('ab: '), read(Flughafen),
    bestimme_saison(Hotel,Flughafen,Monat,Saison), nl,
-   write('Personen: '), lese_zahl(Personen),
-   write('Wochen : '), lese_zahl(Wochen),
+   write('Personen: '), read(Personen),
+   write('Wochen : '), read(Wochen),
    bestimme_preis(Hotel,Personen,Wochen,Saison,Preis),nl,
    write('Gesamtpreis: '), write(Preis), writeln(' Euro'),
-   write('Buchen (ja/nein): '), lese_string(Buchen), Buchen = 'ja',
-   asserta(buchung(Kunde, Hotel, Personen,datum(Tag, Monat, Jahr), Wochen, Flughafen)),
+   write('Buchen (ja/nein): '), read(Buchen), Buchen = 'ja',
+   asserta(buchung(Kunde, Hotel, Personen, (datum(Tag, Monat, Jahr)), Wochen, Flughafen)),
    writeln('Gebucht.').
-buchen(_, _).
+%buchen(_, _).
 
 bestimme_saison(Hotel, Flughafen, Monat, Saison):-
    hotel(Hotel, _, _, Gebiet),
@@ -189,11 +245,10 @@ bestimme_saison(Hotel, _Flughafen, Monat, Saison):- hotel(Hotel, _, _, Gebiet),
   fail.
 
 bestimme_preis(Hotel, Personen, Wochen, Saison, Preis):-
-   preise(Hotel, Saison, Wochen, Kosten),
+   preis(Hotel, Saison, Wochen, Kosten),
    Preis is Personen * Kosten, !.
 
 % --- Formatierungsbefehle ---------------------------
-
 
 lese_datum(Tag, Monat, Jahr):-
        nl, write('Tag(DD): '), read(Tag),

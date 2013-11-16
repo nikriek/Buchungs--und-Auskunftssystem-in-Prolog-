@@ -1,0 +1,7 @@
+% Autor:
+% Datum: 06.11.2013
+
+vater(steffen, paul).
+vater(fritz, karin).
+vater(steffen, lisa).
+vater(paul, maria).

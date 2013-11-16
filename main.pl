@@ -6,7 +6,14 @@ start:-
         initialisierung, menue, terminierung.
 
 initialisierung:-
-        titel, retractall(wahl(_)), asserta(wahl(gebiet(_))), asserta(wahl(hotel(_))), asserta(wahl(kunde(_))), writeln('Lade Datenbank...'), tab(2), consult('C:/Users/Jonas/Documents/GitHub/prolog-project/frkunden.pl'), tab(2), consult('C:/Users/Jonas/Documents/GitHub/prolog-project/frbuchen.pl'), tab(2), consult('C:/Users/Jonas/Documents/GitHub/prolog-project/frhotel.pl'), nl.
+        titel, retractall(wahl(_)),
+        asserta(wahl(gebiet(_))),
+        asserta(wahl(hotel(_))),
+        asserta(wahl(kunde(_))),
+        writeln('Lade Datenbank...'), tab(2),
+        consult('Z:/prolog-project/frkunden.pl'), tab(2),
+        consult('Z:/prolog-project/frbuchen.pl'), tab(2),
+        consult('Z:/prolog-project/frhotel.pl'), nl.
 
 titel:-
         writeln('----- Buchungs- und Auskunftssystem ------'), writeln('----- Froh-Reisen GmbH, Darmstadt ------'), nl.
@@ -29,8 +36,8 @@ menue.
 
 terminierung:- titel,
         writeln('Speichere Datenbank...'),
-        write(' Kunden...'), rename_file('C:/Users/Jonas/Documents/GitHub/prolog-project/frkunden.pl', 'frkunden.bak'), tell('C:/Users/Jonas/Documents/GitHub/prolog-project/frkunden.pl'), listing(kunde), told, writeln(' ok!'),
-        write(' Buchungen...'), rename_file('C:/Users/Jonas/Documents/GitHub/prolog-project/frbuchen.pl', 'frbuchen.bak'), tell('C:/Users/Jonas/Documents/GitHub/prolog-project/frbuchen.pl'), listing(buchung), told, writeln(' ok!'),
+        write(' Kunden...'), rename_file('Z:/prolog-project/frkunden.pl', 'frkunden.bak'), tell('Z:/prolog-project/frkunden.pl'), listing(kunde), told, writeln(' ok!'),
+        write(' Buchungen...'), rename_file('Z:/prolog-project/frbuchen.pl', 'frbuchen.bak'), tell('Z:/prolog-project/frbuchen.pl'), listing(buchung), told, writeln(' ok!'),
         retractall(wahl(_)).
 
 % --- Menüverwaltung -----------------------------------------------------------
@@ -38,8 +45,7 @@ terminierung:- titel,
 wahl_ausfuehren(0'1):-
         writeln(' Urlaubsgebiete'), nl,
         gebiete_zeigen,
-        gebiet_waehlen,
-        hotels_zeigen.
+        gebiet_waehlen.
 
 wahl_ausfuehren(0'2):-
         writeln(' Hotels'), nl,
@@ -150,6 +156,9 @@ zeige_hotel(HotelNr):-
 
 % --- Kundenverwaltung -------------------------------
 
+%-- kein Kunde gewaehlt
+bearbeite_kunde(''):- !.
+%-- neuer Kunde
 bearbeite_kunde(Kunde):-
    atom(Kunde),
    writeln('Adresse des neuen Kunden: '), nl,
@@ -161,56 +170,67 @@ bearbeite_kunde(Kunde):-
    last(Liste2, KNr1),
    KundenNr is KNr1 + 1, speicher_kunde(kunde(KundenNr,Kunde,Strasse,PLZ,Ort)),
    !.
+%-- Kundenname
+bearbeite_kunde(Kunde):-
+        kunde(KundenNr, Kunde, _, _, _),
+        retract(wahl(kunde(_))),
+        asserta(wahl(kunde(KundenNr))),
+        zeige_kunde(KundenNr), !.
+%-- Hotelnummer
+bearbeite_kunde(KundenNr):-
+        kunde(KundenNr, _, _, _, _),
+        retract(wahl(kunde(_))),
+        asserta(wahl(kunde(KundenNr))),
+        zeige_kunde(KundenNr), !.
+
+
+zeige_kunde(KundenNr):-
+        writeln('Gewählt: '),
+        kunde(KundenNr, Name, Strasse, PLZ, Ort),
+        linksbuendig(KundenNr, 10),
+        linksbuendig(Name, 25),
+        linksbuendig(Strasse, 40),
+        linksbuendig(PLZ, 20),
+        linksbuendig(Ort, 15), nl.
+zeige_kunde([]).
 
 speicher_kunde(kunde(KundenNr,Kunde,Strasse,PLZ,Ort)):-
    nl, write('Adresse korrekt (ja/nein): '), read(Antwort),
    Antwort = 'ja',
    assert(kunde(KundenNr, Kunde, Strasse, PLZ, Ort)),
    retract(wahl(kunde(_))), asserta(wahl(kunde(KundenNr))).
-speicher_kunde(_).
 
 % --- Holen von Kunden/Hotels --------------------------------------------------
 
 hole_hotel(HotelNr):-
-   wahl(hotel(HotelNr)), var(HotelNr),
-   wahl_ausfuehren(0'2),
-   fail.
-hole_hotel(HotelNr):-
    wahl(hotel(HotelNr)), nonvar(HotelNr),
    zeige_hotel(HotelNr).
+hole_hotel(HotelNr):-
+   wahl(hotel(HotelNr)), var(HotelNr),
+   wahl_ausfuehren(0'2).
    
-hole_kunde(KundenNr):-
-   wahl(kunde(KundenNr)), var(KundenNr),
-   wahl_ausfuehren(0'3),
-   fail.
 hole_kunde(KundenNr):-
    wahl(kunde(KundenNr)), nonvar(KundenNr),
    zeige_kunde(KundenNr).
-
-zeige_kunde(KundenNr):-
-   kunde(KundenNr,Kunde,Strasse,PLZ,Ort),
-   linksbuendig(KundenNr, 10),
-   linksbuendig(Kunde, 25),
-   linksbuendig(Strasse, 37),
-   linksbuendig(PLZ, 10),
-   linksbuendig(Ort, 20),
-   nl.
+hole_kunde(KundenNr):-
+   wahl(kunde(KundenNr)), var(KundenNr),
+   wahl_ausfuehren(0'3).
 
 % --- Buchungsverwaltung -------------------------------------------------------
 
 buchen(Hotel, Kunde):-
    nl, writeln('Abflug'),
    write('am: '), lese_datum(Tag, Monat, Jahr),
-   write('ab: '), lese_string(Flughafen),
+   write('ab: '), read(Flughafen),
    bestimme_saison(Hotel,Flughafen,Monat,Saison), nl,
-   write('Personen: '), lese_zahl(Personen),
-   write('Wochen : '), lese_zahl(Wochen),
+   write('Personen: '), read(Personen),
+   write('Wochen : '), read(Wochen),
    bestimme_preis(Hotel,Personen,Wochen,Saison,Preis),nl,
    write('Gesamtpreis: '), write(Preis), writeln(' Euro'),
-   write('Buchen (ja/nein): '), lese_string(Buchen), Buchen = 'ja',
-   asserta(buchung(Kunde, Hotel, Personen,datum(Tag, Monat, Jahr), Wochen, Flughafen)),
+   write('Buchen (ja/nein): '), read(Buchen), Buchen = 'ja',
+   asserta(buchung(Kunde, Hotel, Personen, (datum(Tag, Monat, Jahr)), Wochen, Flughafen)),
    writeln('Gebucht.').
-buchen(_, _).
+%buchen(_, _).
 
 bestimme_saison(Hotel, Flughafen, Monat, Saison):-
    hotel(Hotel, _, _, Gebiet),
@@ -223,7 +243,7 @@ bestimme_saison(Hotel, _Flughafen, Monat, Saison):- hotel(Hotel, _, _, Gebiet),
   fail.
 
 bestimme_preis(Hotel, Personen, Wochen, Saison, Preis):-
-   preise(Hotel, Saison, Wochen, Kosten),
+   preis(Hotel, Saison, Wochen, Kosten),
    Preis is Personen * Kosten, !.
 
 % --- Formatierungsbefehle ---------------------------
