@@ -1,4 +1,4 @@
-% Autor: Georg Zänker, Niklas Rieckenbrauck, Jonas Umland
+% Autor: Georg Zänker, Niklas Riekenbrauck, Jonas Umland
 % Datum: 27.10.2013
 
 % Benutzungsschnittstelle
@@ -11,9 +11,9 @@ initialisierung:-
         asserta(wahl(hotel(_))),
         asserta(wahl(kunde(_))),
         writeln('Lade Datenbank...'), tab(2),
-        consult('frkunden.pl'), tab(2),
-        consult('frbuchen.pl'), tab(2),
-        consult('frhotel.pl'), nl.
+        consult('Z:/prolog-project/frkunden.pl'), tab(2),
+        consult('Z:/prolog-project/frbuchen.pl'), tab(2),
+        consult('Z:/prolog-project/frhotel.pl'), nl.
 
 titel:-
         writeln('----- Buchungs- und Auskunftssystem ------'), writeln('----- Froh-Reisen GmbH, Darmstadt ------'), nl.
@@ -36,8 +36,8 @@ menue.
 
 terminierung:- titel,
         writeln('Speichere Datenbank...'),
-        write(' Kunden...'), rename_file('frkunden.pl', 'frkunden.bak'), tell('frkunden.pl'), listing(kunde), told, writeln(' ok!'),
-        write(' Buchungen...'), rename_file('frbuchen.pl', 'frbuchen.bak'), tell('frbuchen.pl'), listing(buchung), told, writeln(' ok!'),
+        write(' Kunden...'), rename_file('Z:/prolog-project/frkunden.pl', 'frkunden.bak'), tell('Z:/prolog-project/frkunden.pl'), listing(kunde), told, writeln(' ok!'),
+        write(' Buchungen...'), rename_file('Z:/prolog-project/frbuchen.pl', 'frbuchen.bak'), tell('Z:/prolog-project/frbuchen.pl'), listing(buchung), told, writeln(' ok!'),
         retractall(wahl(_)).
 
 % --- Menüverwaltung -----------------------------------------------------------
@@ -99,13 +99,11 @@ gebiet_waehlen:-
 
 %kein Gebiet gewaehlt
 bearbeite_gebiet('').
-
 %vorhandenes Gebiet
 bearbeite_gebiet(Gebiet):-
         hotel(_, _, _, Gebiet),
         retract(wahl(gebiet(_))),
         asserta(wahl(gebiet(Gebiet))).
-
 %nicht vorhandenes Gebiet
 bearbeite_gebiet(Gebiet):-
                 not(hotel(_,_,_,Gebiet)),
@@ -224,13 +222,13 @@ buchen(Hotel, Kunde):-
    write('ab: '), read(Flughafen),
    bestimme_saison(Hotel,Flughafen,Monat,Saison), nl,
    write('Personen: '), read(Personen),
-   write('Wochen : '), read(Wochen),
+   pruefe_wochen(Hotel),
    bestimme_preis(Hotel,Personen,Wochen,Saison,Preis),nl,
    write('Gesamtpreis: '), write(Preis), writeln(' Euro'),
    write('Buchen (ja/nein): '), read(Buchen), Buchen = 'ja',
    asserta(buchung(Kunde, Hotel, Personen, (datum(Tag, Monat, Jahr)), Wochen, Flughafen)),
    writeln('Gebucht.').
-%buchen(_, _).
+buchen(_, _).
 
 bestimme_saison(Hotel, Flughafen, Monat, Saison):-
    hotel(Hotel, _, _, Gebiet),
@@ -246,6 +244,14 @@ bestimme_preis(Hotel, Personen, Wochen, Saison, Preis):-
    preis(Hotel, Saison, Wochen, Kosten),
    Preis is Personen * Kosten, !.
 
+pruefe_wochen(Hotel):-
+   write('Wochen : '), read(Wochen),
+   preis(Hotel,_,Wochen,_),fail;
+   write('Die Wochenzahl ist falsch. Du kannst maximal '),
+   findall(Wochen, preis(Hotel,_,Wochen,_), Liste1), sort(Liste1, Liste2),last(Liste2, Wochen),
+   write(Wochen), write(' buchen'),nl,
+   pruefe_wochen(Hotel).
+   
 % --- Formatierungsbefehle ---------------------------
 
 lese_datum(Tag, Monat, Jahr):-
