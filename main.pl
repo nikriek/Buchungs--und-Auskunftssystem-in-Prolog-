@@ -163,11 +163,16 @@ bearbeite_kunde(Kunde):-
    write('Strasse und Nr.: '), read(Strasse),
    write('Postleitzahl : '), read(PLZ),
    write('Ort : '), read(Ort),
+
+  %atomic_list_concat([LStrasse|Tail], ' ', Strasse), not(integer(LStrasse)), last(Tail,LNummer), atom_number(LNummer, X),integer(X),
+  integer(PLZ),
+  not(integer(Ort)),
+
    findall(KNr, kunde(KNr,_,_,_,_), Liste1),
    sort(Liste1, Liste2),
    last(Liste2, KNr1),
    KundenNr is KNr1 + 1, speicher_kunde(kunde(KundenNr,Kunde,Strasse,PLZ,Ort)),
-   !.
+   !; writeln('Ungueltige Adresse'),bearbeite_kunde(Kunde).
 %-- Kundenname
 bearbeite_kunde(Kunde):-
         kunde(KundenNr, Kunde, _, _, _),

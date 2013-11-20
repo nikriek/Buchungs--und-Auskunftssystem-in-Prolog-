@@ -1,4 +1,3 @@
-
 :- dynamic kunde/5.
 
 kunde(116, kakamus, 123, 456, 789).
@@ -11,3 +10,4 @@ kunde(113, 'Bozdag', 'Kostheimerstr. 18', 64354, 'Reinheim').
 kunde(114, aer, aer, aer, aer).
 kunde(115, zarner, k, d, s).
 kunde(116, kakamus, 123, 456, 789).
+
