@@ -11,12 +11,18 @@ initialisierung:-
         asserta(wahl(hotel(_))),
         asserta(wahl(kunde(_))),
         writeln('Lade Datenbank...'), tab(2),
+<<<<<<< HEAD
         %consult('Z:\prolog-project\frkunden.pl')
         tab(2),
         %consult('Z:\prolog-project\frbuchen.pl')
         tab(2),
         %consult('Z:\prolog-project\frhotel.pl')
         nl.
+=======
+        consult('C:/Users/Jonas/Documents/GitHub/Buchungs--und-Auskunftssystem-in-Prolog-/frkunden.pl'), tab(2),
+        consult('C:/Users/Jonas/Documents/GitHub/Buchungs--und-Auskunftssystem-in-Prolog-/frbuchen.pl'), tab(2),
+        consult('C:/Users/Jonas/Documents/GitHub/Buchungs--und-Auskunftssystem-in-Prolog-/frhotel.pl'), nl.
+>>>>>>> 5bf1fb276b8ac9f07653c908bce7dc621164293c
 
 titel:-
         writeln('----- Buchungs- und Auskunftssystem ------'), writeln('----- Froh-Reisen GmbH, Darmstadt ------'), nl.
@@ -39,8 +45,8 @@ menue.
 
 terminierung:- titel,
         writeln('Speichere Datenbank...'),
-        write(' Kunden...'), rename_file('frkunden.pl', 'frkunden.bak'), tell('frkunden.pl'), listing(kunde), told, writeln(' ok!'),
-        write(' Buchungen...'), rename_file('frbuchen.pl', 'frbuchen.bak'), tell('frbuchen.pl'), listing(buchung), told, writeln(' ok!'),
+        write(' Kunden...'), rename_file('C:/Users/Jonas/Documents/GitHub/Buchungs--und-Auskunftssystem-in-Prolog-/frkunden.pl', 'frkunden.bak'), tell('C:/Users/Jonas/Documents/GitHub/Buchungs--und-Auskunftssystem-in-Prolog-/frkunden.pl'), listing(kunde), told, writeln(' ok!'),
+        write(' Buchungen...'), rename_file('C:/Users/Jonas/Documents/GitHub/Buchungs--und-Auskunftssystem-in-Prolog-/frbuchen.pl', 'frbuchen.bak'), tell('C:/Users/Jonas/Documents/GitHub/Buchungs--und-Auskunftssystem-in-Prolog-/frbuchen.pl'), listing(buchung), told, writeln(' ok!'),
         retractall(wahl(_)).
 
 % --- Menüverwaltung -----------------------------------------------------------
@@ -159,6 +165,18 @@ zeige_hotel(HotelNr):-
 
 %-- kein Kunde gewaehlt
 bearbeite_kunde(''):- !.
+%-- Kundenname
+bearbeite_kunde(Kunde):-
+        kunde(KundenNr, Kunde, _, _, _),
+        retract(wahl(kunde(_))),
+        asserta(wahl(kunde(KundenNr))),
+        zeige_kunde(KundenNr), !.
+%-- Hotelnummer
+bearbeite_kunde(KundenNr):-
+        kunde(KundenNr, _, _, _, _),
+        retract(wahl(kunde(_))),
+        asserta(wahl(kunde(KundenNr))),
+        zeige_kunde(KundenNr), !.
 %-- neuer Kunde
 bearbeite_kunde(Kunde):-
    atom(Kunde),
@@ -166,10 +184,20 @@ bearbeite_kunde(Kunde):-
    write('Strasse und Nr.: '), read(Strasse),
    write('Postleitzahl : '), read(PLZ),
    write('Ort : '), read(Ort),
+<<<<<<< HEAD
+=======
+
+  %atomic_list_concat([LStrasse|Tail], ' ', Strasse), not(integer(LStrasse)), last(Tail,LNummer), atom_number(LNummer, X),integer(X),
+   not(integer(Strasse),
+  integer(PLZ),
+  not(integer(Ort)),
+
+>>>>>>> 5bf1fb276b8ac9f07653c908bce7dc621164293c
    findall(KNr, kunde(KNr,_,_,_,_), Liste1),
    sort(Liste1, Liste2),
    last(Liste2, KNr1),
    KundenNr is KNr1 + 1, speicher_kunde(kunde(KundenNr,Kunde,Strasse,PLZ,Ort)),
+<<<<<<< HEAD
    !.
 %-- Kundenname
 bearbeite_kunde(Kunde):-
@@ -184,6 +212,9 @@ bearbeite_kunde(KundenNr):-
         asserta(wahl(kunde(KundenNr))),
         zeige_kunde(KundenNr), !.
 
+=======
+   !; writeln('Ungueltige Adresse'),bearbeite_kunde(Kunde).
+>>>>>>> 5bf1fb276b8ac9f07653c908bce7dc621164293c
 
 zeige_kunde(KundenNr):-
         writeln('Gewählt: '),
