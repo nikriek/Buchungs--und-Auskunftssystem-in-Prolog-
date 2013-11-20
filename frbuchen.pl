@@ -1,14 +1,8 @@
 :- dynamic buchung/6.
 
 buchung(101, emkat1n, 3, datum(12, 9, 12), 1, 'Frankfurt').
-buchung(_, emkat1n, 3, datum(12, 8, 12), 1, 'Frankfurt').
-buchung(_, emkat1n, 2, datum(22, 9, 12), 1, 'Frankfurt').
 buchung(101, emkat1n, 3, datum(12, 9, 12), 1, 'Frankfurt').
-buchung(_, emkat1n, 3, datum(12, 8, 12), 1, 'Frankfurt').
-buchung(_, emkat1n, 2, datum(22, 9, 12), 1, 'Frankfurt').
 buchung(101, emkat1n, 3, datum(12, 9, 12), 1, 'Frankfurt').
-buchung(_, emkat1n, 3, datum(12, 8, 12), 1, 'Frankfurt').
-buchung(_, emkat1n, 2, datum(22, 9, 12), 1, 'Frankfurt').
 buchung(114, emkat1n, 15, datum(12, 10, 13), 2, 'Frankfurt').
 buchung(104, emkat1n, 10, datum(12, 10, 12), 2, 'Frankfurt').
 buchung(104, emkat1n, 10, datum(12, 10, 12), 2, 'Frankfurt').
