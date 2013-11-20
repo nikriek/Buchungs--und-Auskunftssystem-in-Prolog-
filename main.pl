@@ -11,9 +11,9 @@ initialisierung:-
         asserta(wahl(hotel(_))),
         asserta(wahl(kunde(_))),
         writeln('Lade Datenbank...'), tab(2),
-        consult('frkunden.pl'), tab(2),
-        consult('frbuchen.pl'), tab(2),
-        consult('frhotel.pl'), nl.
+        consult('C:/Users/Jonas/Documents/GitHub/Buchungs--und-Auskunftssystem-in-Prolog-/frkunden.pl'), tab(2),
+        consult('C:/Users/Jonas/Documents/GitHub/Buchungs--und-Auskunftssystem-in-Prolog-/frbuchen.pl'), tab(2),
+        consult('C:/Users/Jonas/Documents/GitHub/Buchungs--und-Auskunftssystem-in-Prolog-/frhotel.pl'), nl.
 
 titel:-
         writeln('----- Buchungs- und Auskunftssystem ------'), writeln('----- Froh-Reisen GmbH, Darmstadt ------'), nl.
@@ -36,8 +36,8 @@ menue.
 
 terminierung:- titel,
         writeln('Speichere Datenbank...'),
-        write(' Kunden...'), rename_file('frkunden.pl', 'frkunden.bak'), tell('frkunden.pl'), listing(kunde), told, writeln(' ok!'),
-        write(' Buchungen...'), rename_file('frbuchen.pl', 'frbuchen.bak'), tell('frbuchen.pl'), listing(buchung), told, writeln(' ok!'),
+        write(' Kunden...'), rename_file('C:/Users/Jonas/Documents/GitHub/Buchungs--und-Auskunftssystem-in-Prolog-/frkunden.pl', 'frkunden.bak'), tell('C:/Users/Jonas/Documents/GitHub/Buchungs--und-Auskunftssystem-in-Prolog-/frkunden.pl'), listing(kunde), told, writeln(' ok!'),
+        write(' Buchungen...'), rename_file('C:/Users/Jonas/Documents/GitHub/Buchungs--und-Auskunftssystem-in-Prolog-/frbuchen.pl', 'frbuchen.bak'), tell('C:/Users/Jonas/Documents/GitHub/Buchungs--und-Auskunftssystem-in-Prolog-/frbuchen.pl'), listing(buchung), told, writeln(' ok!'),
         retractall(wahl(_)).
 
 % --- Menüverwaltung -----------------------------------------------------------
@@ -156,23 +156,6 @@ zeige_hotel(HotelNr):-
 
 %-- kein Kunde gewaehlt
 bearbeite_kunde(''):- !.
-%-- neuer Kunde
-bearbeite_kunde(Kunde):-
-   atom(Kunde),
-   writeln('Adresse des neuen Kunden: '), nl,
-   write('Strasse und Nr.: '), read(Strasse),
-   write('Postleitzahl : '), read(PLZ),
-   write('Ort : '), read(Ort),
-
-  %atomic_list_concat([LStrasse|Tail], ' ', Strasse), not(integer(LStrasse)), last(Tail,LNummer), atom_number(LNummer, X),integer(X),
-  integer(PLZ),
-  not(integer(Ort)),
-
-   findall(KNr, kunde(KNr,_,_,_,_), Liste1),
-   sort(Liste1, Liste2),
-   last(Liste2, KNr1),
-   KundenNr is KNr1 + 1, speicher_kunde(kunde(KundenNr,Kunde,Strasse,PLZ,Ort)),
-   !; writeln('Ungueltige Adresse'),bearbeite_kunde(Kunde).
 %-- Kundenname
 bearbeite_kunde(Kunde):-
         kunde(KundenNr, Kunde, _, _, _),
@@ -185,7 +168,24 @@ bearbeite_kunde(KundenNr):-
         retract(wahl(kunde(_))),
         asserta(wahl(kunde(KundenNr))),
         zeige_kunde(KundenNr), !.
+%-- neuer Kunde
+bearbeite_kunde(Kunde):-
+   atom(Kunde),
+   writeln('Adresse des neuen Kunden: '), nl,
+   write('Strasse und Nr.: '), read(Strasse),
+   write('Postleitzahl : '), read(PLZ),
+   write('Ort : '), read(Ort),
 
+  %atomic_list_concat([LStrasse|Tail], ' ', Strasse), not(integer(LStrasse)), last(Tail,LNummer), atom_number(LNummer, X),integer(X),
+   not(integer(Strasse),
+  integer(PLZ),
+  not(integer(Ort)),
+
+   findall(KNr, kunde(KNr,_,_,_,_), Liste1),
+   sort(Liste1, Liste2),
+   last(Liste2, KNr1),
+   KundenNr is KNr1 + 1, speicher_kunde(kunde(KundenNr,Kunde,Strasse,PLZ,Ort)),
+   !; writeln('Ungueltige Adresse'),bearbeite_kunde(Kunde).
 
 zeige_kunde(KundenNr):-
         writeln('Gewählt: '),
